@@ -7,6 +7,8 @@ import React from "react";
 import { NativeBaseProvider, StatusBar } from "native-base";
 import { SignIn } from './src/screens/Signin';
 import { AuthContextProvider } from './src/contexts/AuthContext';
+import { New } from './src/screens/New';
+import { Pools } from './src/screens/Pools';
 
 export default function App() {
 
@@ -21,7 +23,7 @@ export default function App() {
 
 
         {
-          fontsLoaded ? <SignIn /> : <Loading />
+          fontsLoaded ? <Pools /> : <New />
         }
 
       </AuthContextProvider>
