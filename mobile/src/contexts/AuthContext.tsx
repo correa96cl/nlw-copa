@@ -2,6 +2,7 @@ import { createContext, ReactNode, useState, useEffect } from "react";
 import * as Google from 'expo-auth-session/providers/google';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import { api } from "../services/api";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -27,13 +28,13 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<UserProps>({} as UserProps);
     const [isUserLoading, setIsUserLoading] = useState(false);
 
-   const [request, response, promptAsync ] = Google.useAuthRequest({
+    const [request, response, promptAsync] = Google.useAuthRequest({
         clientId: '246991117820-n45drfcfad3mjaiicfg3l4iechnbhh08.apps.googleusercontent.com',
-        redirectUri: AuthSession.makeRedirectUri({useProxy: true}),
+        redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
         scopes: ['profile', 'email']
     })
 
-    console.log(AuthSession.makeRedirectUri({useProxy: true}));
+    console.log(AuthSession.makeRedirectUri({ useProxy: true }));
 
     async function signIn() {
 
@@ -43,20 +44,36 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
         } catch (error) {
             console.log(error);
             throw error;
-        } finally{
+        } finally {
             setIsUserLoading(false);
         }
 
     }
 
-    async function signInWithGoogle(access_token: string){
-        console.log("TOKEN DE AUTENTIFICAÇÃO ====> ", access_token);
+    async function signInWithGoogle(access_token: string) {
+        try {
+            setIsUserLoading(true);
+
+            const tokenresponse = await api.post('/users', {access_token});
+
+            api.defaults.headers.common['Authorization'] = `Bearer ${tokenresponse.data.token}`;
+
+            const userInfoResponse = await api.get('/me');
+
+            setUser(userInfoResponse.data);
+            
+        } catch (error) {
+            console.log(error);
+            throw error;
+        } finally {
+            setIsUserLoading(false);
+        }
     }
 
     useEffect(() => {
-if (response?.type === 'success' && response.authentication?.accessToken){
-    signInWithGoogle(response.authentication.accessToken);
-}
+        if (response?.type === 'success' && response.authentication?.accessToken) {
+            signInWithGoogle(response.authentication.accessToken);
+        }
     }, [response]);
 
     return (
