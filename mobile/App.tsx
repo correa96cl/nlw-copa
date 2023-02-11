@@ -5,10 +5,7 @@ import { Loading } from './src/components/Loading';
 
 import React from "react";
 import { NativeBaseProvider, StatusBar } from "native-base";
-import { SignIn } from './src/screens/Signin';
 import { AuthContextProvider } from './src/contexts/AuthContext';
-import { New } from './src/screens/New';
-import { Pools } from './src/screens/Pools';
 import { Routes } from './src/routes';
 
 export default function App() {
